@@ -60,27 +60,15 @@ public class InformeController {
     }
 
     @GetMapping("/info/{idInforme1}")
-    public ResponseEntity<Informe> getInformeByIdInforme1(@PathVariable String idInforme1) {
-        Informe informe = informeService.getInformesByIdInforme1(idInforme1);
+    public ResponseEntity<Informe> getInformeByIdInforme1(@PathVariable String idInforme1,
+            @RequestParam(required = false) String idInforme) {
+        String id = idInforme != null ? idInforme : idInforme1;
+        Informe informe = informeService.getInformesByIdInforme1(id);
         if (informe != null) {
             return new ResponseEntity<>(informe, HttpStatus.OK);
         } else {
-            // También manejar solicitudes con parámetros de consulta
-            String idInformeFromQueryParam = ServletUriComponentsBuilder.fromCurrentRequest()
-                .replacePath("/informes/info/{idInforme1}")
-                .buildAndExpand(idInforme1)
-                .toUri()
-                .getQuery();
-            
-            if (idInformeFromQueryParam != null && !idInformeFromQueryParam.isEmpty()) {
-                Informe informeFromQueryParam = informeService.getInformesByIdInforme1(idInformeFromQueryParam);
-                if (informeFromQueryParam != null) {
-                    return new ResponseEntity<>(informeFromQueryParam, HttpStatus.OK);
-                }
-            }
-            
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
+
 }
