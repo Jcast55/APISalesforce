@@ -1,12 +1,12 @@
 package com.web.app.Controller;
 
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.web.app.Model.Informe;
 import com.web.app.Service.InformeService;
@@ -60,13 +60,27 @@ public class InformeController {
     }
 
     @GetMapping("/info/{idInforme1}")
-    public ResponseEntity<Informe> getInformeByIdInfome1(@PathVariable String idInforme1) {
+    public ResponseEntity<Informe> getInformeByIdInforme1(@PathVariable String idInforme1) {
         Informe informe = informeService.getInformesByIdInforme1(idInforme1);
         if (informe != null) {
             return new ResponseEntity<>(informe, HttpStatus.OK);
         } else {
+            // También manejar solicitudes con parámetros de consulta
+            String idInformeFromQueryParam = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .replacePath("/informes/info/{idInforme1}")
+                    .buildAndExpand(idInforme1)
+                    .toUri()
+                    .getQuery();
+
+            if (idInformeFromQueryParam != null && !idInformeFromQueryParam.isEmpty()) {
+                Informe informeFromQueryParam = informeService.getInformesByIdInforme1(idInformeFromQueryParam);
+                if (informeFromQueryParam != null) {
+                    return new ResponseEntity<>(informeFromQueryParam, HttpStatus.OK);
+                }
+            }
+
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-}
 
+}
