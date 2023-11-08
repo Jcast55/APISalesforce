@@ -67,20 +67,20 @@ public class InformeController {
         } else {
             // También manejar solicitudes con parámetros de consulta
             String idInformeFromQueryParam = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .replacePath("/informes/info/{idInforme1}")
-                    .buildAndExpand(idInforme1)
-                    .toUri()
-                    .getQuery();
-
+                .replacePath("/informes/info/{idInforme1}")
+                .buildAndExpand(idInforme1)
+                .toUri()
+                .getQuery();
+            
             if (idInformeFromQueryParam != null && !idInformeFromQueryParam.isEmpty()) {
                 Informe informeFromQueryParam = informeService.getInformesByIdInforme1(idInformeFromQueryParam);
                 if (informeFromQueryParam != null) {
                     return new ResponseEntity<>(informeFromQueryParam, HttpStatus.OK);
                 }
             }
-
+            
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
+    
 }
