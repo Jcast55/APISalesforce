@@ -48,7 +48,7 @@ public class InformeController {
   @PutMapping(value = "/informes/{id}", consumes = MediaType.TEXT_HTML_VALUE + ";charset=UTF-8")
 public ResponseEntity<Informe> updateInforme(
         @PathVariable Long id,
-        @RequestBody(required = false) String informeData,
+        @RequestBody(required = false) Informe informeData,
         @RequestHeader("Content-Type") String contentType) {
 
     // Verifica el tipo de contenido de la solicitud
