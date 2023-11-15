@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.MediaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.web.app.Model.Informe;
 import com.web.app.Service.InformeService;
@@ -45,14 +46,14 @@ public class InformeController {
     }
 
    
-  @PutMapping(value = "/informes/{id}", consumes = MediaType.TEXT_HTML_VALUE + ";charset=UTF-8")
+@PutMapping(value = "/informes/{id}", consumes = {"application/json", "text/plain;charset=UTF-8"})
 public ResponseEntity<Informe> updateInforme(
         @PathVariable Long id,
-        @RequestBody(required = false) Informe informeData,
+        @RequestBody(required = false) String informeData,
         @RequestHeader("Content-Type") String contentType) {
 
     // Verifica el tipo de contenido de la solicitud
-    if (!contentType.equalsIgnoreCase(MediaType.TEXT_HTML_VALUE + ";charset=UTF-8")) {
+    if (!contentType.equalsIgnoreCase("application/json") && !contentType.equalsIgnoreCase("text/plain;charset=UTF-8")) {
         // Devuelve una respuesta de tipo de contenido no admitido si es diferente
         return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
@@ -62,8 +63,40 @@ public ResponseEntity<Informe> updateInforme(
         // Devuelve una respuesta adecuada para el cuerpo de la solicitud nulo
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-    // Aquí puedes procesar informeData según tus necesidades
-    Informe updatedInforme = informeService.updateInforme(id, informeData);
+
+    Informe updatedInforme;
+
+    // Procesa informeData según el tipo de contenido
+    if (contentType.equalsIgnoreCase("application/json")) {
+        // Procesa como JSON
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Informe informeObject = objectMapper.readValue(informeData, Informe.class);
+            updatedInforme = informeService.updateInforme(id, informeObject);
+        } catch (IOException e) {
+            e.printStackTrace(); // Manejar la excepción según tus necesidades
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    } else {
+        // Procesa como texto plano
+        String[] parts = informeData.split("\n");
+        // Asegúrate de manejar el array parts adecuadamente y crear un objeto Informe
+        // con los valores extraídos.
+        // Puedes usar parts[0], parts[1], etc., para obtener los valores individuales.
+        // Actualiza la lógica según tus necesidades.
+        // ...
+
+        // Ejemplo básico (asegúrate de manejar los índices correctamente):
+        Informe informeObject = new Informe();
+        informeObject.setHoraInicio(parts[0]);
+        informeObject.setIdInforme1(parts[1]);
+        informeObject.setHorasTrabajadas(Integer.parseInt(parts[2]));
+        informeObject.setHoraFinalizado(parts[3]);
+        informeObject.setIdContact(parts[4]);
+
+        updatedInforme = informeService.updateInforme(id, informeObject);
+    }
+
     if (updatedInforme != null) {
         return new ResponseEntity<>(updatedInforme, HttpStatus.OK);
     } else {
