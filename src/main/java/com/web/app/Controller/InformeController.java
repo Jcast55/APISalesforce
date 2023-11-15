@@ -45,7 +45,7 @@ public class InformeController {
     }
 
    
-  @PutMapping(value = "/informes/{id}", consumes = MediaType.TEXT_HTML_VALUE + ";charset=UTF-8")
+  @PutMapping(value = "informes/{id}", consumes = MediaType.TEXT_HTML_VALUE + ";charset=UTF-8")
 public ResponseEntity<Informe> updateInforme(
         @PathVariable Long id,
         @RequestBody(required = false) Informe informeData,
