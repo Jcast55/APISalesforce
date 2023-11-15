@@ -43,15 +43,33 @@ public class InformeController {
         return new ResponseEntity<>(createdInforme, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Informe> updateInforme(@PathVariable Long id, @RequestBody Informe informe) {
-        Informe updatedInforme = informeService.updateInforme(id, informe);
-        if (updatedInforme != null) {
-            return new ResponseEntity<>(updatedInforme, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+   
+  @PutMapping(value = "/informes/{id}", consumes = MediaType.TEXT_HTML_VALUE + ";charset=UTF-8")
+public ResponseEntity<Informe> updateInforme(
+        @PathVariable Long id,
+        @RequestBody(required = false) String informeData,
+        @RequestHeader("Content-Type") String contentType) {
+
+    // Verifica el tipo de contenido de la solicitud
+    if (!contentType.equalsIgnoreCase(MediaType.TEXT_HTML_VALUE + ";charset=UTF-8")) {
+        // Devuelve una respuesta de tipo de contenido no admitido si es diferente
+        return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
+
+    // Si el cuerpo de la solicitud es nulo, puedes manejarlo según tus necesidades
+    if (informeData == null) {
+        // Devuelve una respuesta adecuada para el cuerpo de la solicitud nulo
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    // Aquí puedes procesar informeData según tus necesidades
+    Informe updatedInforme = informeService.updateInforme(id, informeData);
+    if (updatedInforme != null) {
+        return new ResponseEntity<>(updatedInforme, HttpStatus.OK);
+    } else {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+}
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInforme(@PathVariable Long id) {
