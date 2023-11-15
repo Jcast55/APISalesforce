@@ -1,6 +1,10 @@
 package com.web.app.Controller;
 
 import java.util.List;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -80,21 +84,24 @@ public ResponseEntity<Informe> updateInforme(
     } else {
         // Procesa como texto plano
         String[] parts = informeData.split("\n");
-        // Asegúrate de manejar el array parts adecuadamente y crear un objeto Informe
-        // con los valores extraídos.
-        // Puedes usar parts[0], parts[1], etc., para obtener los valores individuales.
-        // Actualiza la lógica según tus necesidades.
-        // ...
+        
+        // Asegúrate de manejar el array 'parts' adecuadamente
+        // Crear un objeto Informe con los valores extraídos.
 
         // Ejemplo básico (asegúrate de manejar los índices correctamente):
-        Informe informeObject = new Informe();
-        informeObject.setHoraInicio(parts[0]);
-        informeObject.setIdInforme1(parts[1]);
-        informeObject.setHorasTrabajadas(Integer.parseInt(parts[2]));
-        informeObject.setHoraFinalizado(parts[3]);
-        informeObject.setIdContact(parts[4]);
+        try {
+            Informe informeObject = new Informe();
+            informeObject.setHoraInicio(parseDate(parts[0]));
+            informeObject.setIdInforme1(parts[1]);
+            informeObject.setHorasTrabajadas(Integer.parseInt(parts[2]));
+            informeObject.setHoraFinalizado(parseDate(parts[3]));
+            informeObject.setIdContact(parts[4]);
 
-        updatedInforme = informeService.updateInforme(id, informeObject);
+            updatedInforme = informeService.updateInforme(id, informeObject);
+        } catch (ParseException e) {
+            e.printStackTrace(); // Manejar la excepción según tus necesidades
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     if (updatedInforme != null) {
@@ -102,6 +109,12 @@ public ResponseEntity<Informe> updateInforme(
     } else {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+}
+
+// Método para convertir String a Date
+private Date parseDate(String dateString) throws ParseException {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    return dateFormat.parse(dateString);
 }
 
 
